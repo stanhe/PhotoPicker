@@ -29,7 +29,7 @@ public enum PhotoHelper {
     public static final String TEMP_PATH = "/Photo_Helper_temp.jpg";
     public static final String PHOTO_TEMP_PATH = "/Photo_Helper_photo.jpg";
     private Uri imageUri;//The Uri to store the big bitmap
-    private String  outPath;
+    private Uri outPath;//output uri.
 
     public String getTempPath() {
         if (activity.getExternalCacheDir() == null) {
@@ -40,7 +40,15 @@ public enum PhotoHelper {
 
     public void prepare(Activity activity, int width, int height, BitmapBackListener backListener){
         this.activity = activity;
-        outPath = getTempPath()+TEMP_PATH;
+        File outFile = new File(getTempPath()+TEMP_PATH);
+        if (!outFile.exists()) {
+            try {
+                outFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        outPath = Uri.fromFile(outFile);
         this.width = width;
         this.height = height;
         this.backListener = backListener;
@@ -80,16 +88,16 @@ public enum PhotoHelper {
                 }
                 break;
             case CROP_BIG_PICTURE://from crop_big_picture
-                if(imageUri != null){
-                    Bitmap bitmap = decodeUriAsBitmap(activity,imageUri);
+                if(outPath != null ){
+                    Bitmap bitmap = decodeUriAsBitmap(activity,outPath);
                     if (backListener!=null)
-                        backListener.onBitmapResult(imageUri,bitmap);
+                        backListener.onBitmapResult(outPath,bitmap);
                 }
                 break;
         }
     }
 
-    private void cropImageUri(Uri uri,String  outPath, int outputX, int outputY, int requestCode){
+    private void cropImageUri(Uri uri,Uri outPath, int outputX, int outputY, int requestCode){
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
         intent.putExtra("crop", "true");
