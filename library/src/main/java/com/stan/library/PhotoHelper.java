@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
@@ -32,7 +33,7 @@ public enum PhotoHelper {
     private Uri outPath;//output uri.
 
     public String getTempPath() {
-        if (activity.getExternalCacheDir() == null) {
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             return activity.getCacheDir().getAbsolutePath();
         }
         return activity.getExternalCacheDir().getAbsolutePath();
@@ -124,5 +125,12 @@ public enum PhotoHelper {
         return bitmap;
     }
 
+    public Uri getOutUri(){
+        return outPath;
+    }
+
+    public String  getOutFilePath(){
+        return outPath.getPath();
+    }
 
 }
